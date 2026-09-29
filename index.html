@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Manager · CMS</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+                 'Segoe UI', Roboto, sans-serif;
+    transition: background-color .3s ease,
+                border-color .3s ease,
+                color .3s ease;
+}
+
+:root {
+    --bg-body: #f5f9ff;
+    --bg-container: #fff;
+    --bg-card: #fff;
+    --bg-form: #f8fcff;
+    --bg-input: #fff;
+    --bg-hover: #f0f6ff;
+    --bg-avatar: #e2edff;
+    --bg-tag: #e7f3ff;
+    --bg-stats: #d9e9ff;
+    --text-primary: #0a2540;
+    --text-secondary: #3d5e7a;
+    --text-muted: #7d9bb8;
+    --text-label: #4b6b8a;
+    --border-light: #e2edf7;
+    --border-input: #cfddee;
+    --border-card: #e3eef9;
+    --accent: #1e6f9f;
+    --accent-hover: #155a82;
+    --accent-light: #2b7fc4;
+    --danger: #c73b3b;
+    --danger-bg: #ffeaea;
+    --shadow-container: 0 20px 40px rgba(0,20,50,.1);
+    --shadow-card: 0 6px 14px rgba(0,20,30,.04);
+}
+
+body.dark {
+    --bg-body: #0b1220;
+    --bg-container: #131c2e;
+    --bg-card: #1a2438;
+    --bg-form: #16202f;
+    --bg-input: #1e2a3d;
+    --bg-hover: #243349;
+    --bg-avatar: #24344f;
+    --bg-tag: #1f3a56;
+    --bg-stats: #1f3a56;
+    --text-primary: #e8f0fa;
+    --text-secondary: #b6c8dd;
+    --text-muted: #7a90ab;
+    --text-label: #8ea6c1;
+    --border-light: #24344c;
+    --border-input: #2d3f5a;
+    --border-card: #24344c;
+    --accent: #3b9bea;
+    --accent-hover: #2d7fc4;
+    --accent-light: #4da8f0;
+    --danger: #ff6b6b;
+    --danger-bg: #3a1e1e;
+    --shadow-container: 0 20px 40px rgba(0,0,0,.4);
+    --shadow-card: 0 6px 14px rgba(0,0,0,.2);
+}
+
+body {
+    background: var(--bg-body);
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+/* =========================
+   LOADING SCREEN
+========================= */
+
+#loadingScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 9999;
+    transition: opacity .7s ease, visibility .7s ease;
+}
+
+#loadingScreen.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-icon {
+    width: 90px;
+    height: 90px;
+    margin: auto auto 1.4rem;
+    border-radius: 24px;
+    background: var(--bg-avatar);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+}
+
+.loading-title {
+    color: var(--text-primary);
+    font-size: 2.3rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+}
+
+.loading-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.loading-spinner {
+    width: 42px;
+    height: 42px;
+    margin: auto;
+    border: 4px solid var(--border-light);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+}
+
+.loading-dots {
+    margin-top: 1rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================
+   LOGIN / ACCOUNT
+========================= */
+
+#authScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#authScreen.hidden {
+    display: none;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 430px;
+    background: var(--bg-container);
+    border-radius: 2rem;
+    padding: 2.2rem;
+    box-shadow: var(--shadow-container);
+    border: 1px solid var(--border-light);
+}
+
+.auth-brand {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.auth-brand-icon {
+    width: 70px;
+    height: 70px;
+    margin: auto auto 1rem;
+    border-radius: 20px;
+    background: var(--bg-avatar);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.auth-brand h2 {
+    color: var(--text-primary);
+    margin-bottom: .4rem;
+}
+
+.auth-brand p {
+    color: var(--text-secondary);
+    font-size: .9rem;
+}
+
+.auth-tabs {
+    display: flex;
+    background: var(--bg-form);
+    padding: 5px;
+    border-radius: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.auth-tab {
+    flex: 1;
+    border: none;
+    padding: .75rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.auth-tab.active {
+    background: var(--accent);
+    color: white;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form.hidden {
+    display: none;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+.input-group label {
+    color: var(--text-label);
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.input-group input {
+    padding: .9rem 1.1rem;
+    border-radius: 2rem;
+    border: 1.5px solid var(--border-input);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 4px rgba(43,127,196,.15);
+}
+
+.auth-btn {
+    border: none;
+    background: var(--accent);
+    color: white;
+    padding: .9rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.auth-btn:hover {
+    background: var(--accent-hover);
+}
+
+.auth-message {
+    min-height: 20px;
+    text-align: center;
+    font-size: .9rem;
+    margin-top: .5rem;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+
+.app-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    background: var(--bg-container);
+    border-radius: 2rem;
+    box-shadow: var(--shadow-container);
+    padding: 2rem;
+}
+
+.app-container.hidden {
+    display: none;
+}
+
+.app-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.app-header h1 {
+    color: var(--text-primary);
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+}
+
+.app-header h1 i {
+    background: var(--bg-avatar);
+    color: var(--accent);
+    padding: .6rem;
+    border-radius: 1rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    flex-wrap: wrap;
+}
+
+.stats-badge,
+.user-badge {
+    background: var(--bg-stats);
+    color: var(--accent);
+    padding: .65rem 1rem;
+    border-radius: 2rem;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.theme-toggle,
+.logout-btn {
+    border: none;
+    cursor: pointer;
+    padding: .7rem 1rem;
+    border-radius: 2rem;
+    background: var(--bg-stats);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.logout-btn {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.theme-toggle:hover,
+.logout-btn:hover {
+    transform: scale(.97);
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-card {
+    background: var(--bg-form);
+    border-radius: 1.5rem;
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-light);
+}
+
+.form-card h2 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+    gap: 1.2rem;
+    align-items: end;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: .85rem 2rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-input);
+    border-radius: 3rem;
+    padding: .2rem 1rem;
+    flex: 1;
+    max-width: 360px;
+}
+
+.search-wrapper i {
+    color: var(--text-muted);
+}
+
+.search-wrapper input {
+    border: none;
+    padding: .75rem;
+    width: 100%;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.filter-group {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-light);
+    color: var(--text-secondary);
+    padding: .55rem 1.1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+}
+
+.filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+/* =========================
+   CONTACT CARDS
+========================= */
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(270px,1fr));
+    gap: 1.2rem;
+}
+
+.contact-card {
+    background: var(--bg-card);
+    border-radius: 1.5rem;
+    padding: 1.4rem;
+    border: 1px solid var(--border-card);
+    box-shadow: var(--shadow-card);
+}
+
+.contact-card:hover {
+    transform: translateY(-3px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    margin-bottom: 1.2rem;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-avatar);
+    color: var(--accent);
+    border-radius: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.contact-name {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.contact-detail {
+    display: flex;
+    gap: .6rem;
+    color: var(--text-secondary);
+    margin-bottom: .6rem;
+    word-break: break-word;
+}
+
+.contact-detail i {
+    width: 18px;
+    color: var(--text-muted);
+}
+
+.category-tag {
+    display: inline-block;
+    background: var(--bg-tag);
+    color: var(--accent);
+    border-radius: 1.5rem;
+    padding: .3rem .9rem;
+    font-size: .75rem;
+    font-weight: 700;
+    margin-top: .5rem;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.action-btn:hover {
+    background: var(--bg-hover);
+    color: var(--accent);
+}
+
+.action-btn.delete:hover {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-form);
+    border-radius: 2rem;
+    border: 2px dashed var(--border-light);
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--text-primary);
+    color: var(--bg-container);
+    padding: 1rem 1.5rem;
+    border-radius: 3rem;
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    transform: translateY(150%);
+    transition: transform .2s ease;
+    z-index: 10000;
+}
+
+.toast.show {
+    transform: translateY(0);
+}
+
+@media(max-width:600px) {
+    body {
+        padding: .8rem;
+    }
+
+    .app-container {
+        padding: 1.2rem;
+    }
+
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-right {
+        width: 100%;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-wrapper {
+        max-width: 100%;
+    }
+
+    .filter-group {
+        justify-content: center;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     LOADING SCREEN
+========================= -->
+
+<div id="loadingScreen">
+    <div class="loading-content">
+
+        <div class="loading-icon">
+            <i class="fas fa-address-book"></i>
+        </div>
+
+        <div class="loading-title">
+            Contact Management System
+        </div>
+
+        <div class="loading-subtitle">
+            Loading your contacts...
+        </div>
+
+        <div class="loading-spinner"></div>
+
+        <div class="loading-dots">
+            •••
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================
+     LOGIN / CREATE ACCOUNT
+========================= -->
+
+<div id="authScreen">
+
+    <div class="auth-card">
+
+        <div class="auth-brand">
+
+            <div class="auth-brand-icon">
+                <i class="fas fa-address-book"></i>
+            </div>
+
+            <h2>Contact Management System</h2>
+
+            <p>Manage your contacts easily</p>
+
+        </div>
+
+
+        <div class="auth-tabs">
+
+            <button
+                class="auth-tab active"
+                id="loginTab"
+                type="button">
+
+                Login
+
+            </button>
+
+            <button
+                class="auth-tab"
+                id="createTab"
+                type="button">
+
+                Create Account
+
+            </button>
+
+        </div>
+
+
+        <!-- LOGIN FORM -->
+
+        <form id="loginForm" class="auth-form">
+
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="you@example.com"
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter your password"
+                    required>
+
+            </div>
+
+
+            <button class="auth-btn" type="submit">
+
+                <i class="fas fa-sign-in-alt"></i>
+                Login
+
+            </button>
+
+        </form>
+
+
+        <!-- CREATE ACCOUNT FORM -->
+
+        <form id="createForm" class="auth-form hidden">
+
+            <div class="input-group">
+
+                <label>Full Name</label>
+
+                <input
+                    type="text"
+                    id="createName"
+                    placeholder="Enter your name"
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    id="createEmail"
+                    placeholder="you@example.com"
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    id="createPassword"
+                    placeholder="Create a password"
+                    minlength="4"
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Confirm Password</label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm your password"
+                    minlength="4"
+                    required>
+
+            </div>
+
+
+            <button class="auth-btn" type="submit">
+
+                <i class="fas fa-user-plus"></i>
+                Create Account
+
+            </button>
+
+        </form>
+
+
+        <div class="auth-message" id="authMessage"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN APPLICATION
+========================= -->
+
+<div class="app-container hidden" id="appContainer">
+
+    <div class="app-header">
+
+        <h1>
+            <i class="fas fa-address-book"></i>
+            Contact Manager
+        </h1>
+
+
+        <div class="header-right">
+
+            <div class="user-badge">
+
+                <i class="fas fa-user"></i>
+
+                <span id="userNameDisplay">
+                    User
+                </span>
+
+            </div>
+
+
+            <div class="stats-badge">
+
+                <i class="fas fa-users"></i>
+
+                <span id="contactCount">
+                    0
+                </span>
+
+                contacts
+
+            </div>
+
+
+            <button
+                class="theme-toggle"
+                id="themeToggle"
+                title="Toggle dark mode">
+
+                <i
+                    class="fas fa-moon"
+                    id="themeIcon">
+                </i>
+
+            </button>
+
+
+            <button
+                class="logout-btn"
+                id="logoutBtn">
+
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADD CONTACT -->
+
+    <div class="form-card">
+
+        <h2>
+
+            <i
+                class="fas fa-user-plus"
+                style="color:var(--accent);">
+            </i>
+
+            Add new contact
+
+        </h2>
+
+
+        <div class="form-grid">
+
+            <div class="input-group">
+
+                <label>Full Name</label>
+
+                <input
+                    type="text"
+                    id="nameInput"
+                    placeholder="e.g. Alex Morgan"
+                    autocomplete="off">
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    id="emailInput"
+                    placeholder="alex@example.com"
+                    autocomplete="off">
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Phone</label>
+
+                <input
+                    type="tel"
+                    id="phoneInput"
+                    placeholder="+91 98765 43210"
+                    autocomplete="off">
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Category</label>
+
+                <input
+                    type="text"
+                    id="categoryInput"
+                    placeholder="Work, Family, etc."
+                    autocomplete="off"
+                    list="categoryHints">
+
+                <datalist id="categoryHints">
+
+                    <option value="Work">
+                    <option value="Family">
+                    <option value="Friends">
+                    <option value="Clients">
+                    <option value="VIP">
+
+                </datalist>
+
+            </div>
+
+
+            <button
+                class="btn-primary"
+                id="addContactBtn">
+
+                <i class="fas fa-plus-circle"></i>
+                Add contact
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH AND FILTER -->
+
+    <div class="toolbar">
+
+        <div class="search-wrapper">
+
+            <i class="fas fa-search"></i>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by name, email or phone...">
+
+        </div>
+
+
+        <div
+            class="filter-group"
+            id="filterGroup">
+
+            <button
+                class="filter-btn active"
+                data-filter="all">
+
+                <i class="fas fa-list-ul"></i>
+                All
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                data-filter="Work">
+
+                <i class="fas fa-briefcase"></i>
+                Work
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                data-filter="Family">
+
+                <i class="fas fa-home"></i>
+                Family
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                data-filter="Friends">
+
+                <i class="fas fa-user-friends"></i>
+                Friends
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                data-filter="Clients">
+
+                <i class="fas fa-handshake"></i>
+                Clients
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTACTS -->
+
+    <div
+        class="contact-grid"
+        id="contactGrid">
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    class="toast"
+    id="toast">
+
+    <i class="fas fa-check-circle"></i>
+
+    <span id="toastMessage">
+        Contact added
+    </span>
+
+</div>
+
+
+<script>
+
+(function() {
+
+    /* =========================
+       GLOBAL VARIABLES
+    ========================= */
+
+    let contacts = [];
+
+    let currentUser = null;
+
+    let currentFilter = "all";
+
+    let searchQuery = "";
+
+
+    /* =========================
+       ELEMENTS
+    ========================= */
+
+    const loadingScreen =
+        document.getElementById("loadingScreen");
+
+    const authScreen =
+        document.getElementById("authScreen");
+
+    const appContainer =
+        document.getElementById("appContainer");
+
+
+    const loginTab =
+        document.getElementById("loginTab");
+
+    const createTab =
+        document.getElementById("createTab");
+
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const createForm =
+        document.getElementById("createForm");
+
+
+    const authMessage =
+        document.getElementById("authMessage");
+
+
+    const logoutBtn =
+        document.getElementById("logoutBtn");
+
+
+    const userNameDisplay =
+        document.getElementById("userNameDisplay");
+
+
+    const contactGrid =
+        document.getElementById("contactGrid");
+
+    const contactCount =
+        document.getElementById("contactCount");
+
+
+    const nameInput =
+        document.getElementById("nameInput");
+
+    const emailInput =
+        document.getElementById("emailInput");
+
+    const phoneInput =
+        document.getElementById("phoneInput");
+
+    const categoryInput =
+        document.getElementById("categoryInput");
+
+    const addContactBtn =
+        document.getElementById("addContactBtn");
+
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+
+    const filterGroup =
+        document.getElementById("filterGroup");
+
+
+    const themeToggle =
+        document.getElementById("themeToggle");
+
+    const themeIcon =
+        document.getElementById("themeIcon");
+
+
+    const toast =
+        document.getElementById("toast");
+
+    const toastMessage =
+        document.getElementById("toastMessage");
+
+
+    /* =========================
+       ACCOUNT SYSTEM
+    ========================= */
+
+    function getAccounts() {
+
+        return JSON.parse(
+            localStorage.getItem("cms_accounts") || "[]"
+        );
+
+    }
+
+
+    function saveAccounts(accounts) {
+
+        localStorage.setItem(
+            "cms_accounts",
+            JSON.stringify(accounts)
+        );
+
+    }
+
+
+    function showAuthMessage(message, error = false) {
+
+        authMessage.textContent = message;
+
+        authMessage.style.color =
+            error
+            ? "var(--danger)"
+            : "var(--accent)";
+
+    }
+
+
+    function showLogin() {
+
+        loginTab.classList.add("active");
+
+        createTab.classList.remove("active");
+
+        loginForm.classList.remove("hidden");
+
+        createForm.classList.add("hidden");
+
+        showAuthMessage("");
+
+    }
+
+
+    function showCreateAccount() {
+
+        createTab.classList.add("active");
+
+        loginTab.classList.remove("active");
+
+        createForm.classList.remove("hidden");
+
+        loginForm.classList.add("hidden");
+
+        showAuthMessage("");
+
+    }
+
+
+    /* CREATE ACCOUNT */
+
+    createForm.addEventListener(
+        "submit",
+        function(e) {
+
+            e.preventDefault();
+
+
+            const name =
+                document.getElementById("createName")
+                .value.trim();
+
+
+            const email =
+                document.getElementById("createEmail")
+                .value.trim()
+                .toLowerCase();
+
+
+            const password =
+                document.getElementById("createPassword")
+                .value;
+
+
+            const confirmPassword =
+                document.getElementById("confirmPassword")
+                .value;
+
+
+            if (!name || !email || !password) {
+
+                showAuthMessage(
+                    "Please fill in all fields.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            if (password !== confirmPassword) {
+
+                showAuthMessage(
+                    "Passwords do not match.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            if (password.length < 4) {
+
+                showAuthMessage(
+                    "Password must contain at least 4 characters.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            const accounts = getAccounts();
+
+
+            const exists =
+                accounts.some(
+                    account =>
+                        account.email === email
+                );
+
+
+            if (exists) {
+
+                showAuthMessage(
+                    "An account with this email already exists.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            const account = {
+
+                id:
+                    Date.now().toString(),
+
+                name: name,
+
+                email: email,
+
+                password: password
+
+            };
+
+
+            accounts.push(account);
+
+            saveAccounts(accounts);
+
+
+            showAuthMessage(
+                "Account created successfully! You can now login."
+            );
+
+
+            createForm.reset();
+
+
+            setTimeout(
+                showLogin,
+                1000
+            );
+
+        }
+    );
+
+
+    /* LOGIN */
+
+    loginForm.addEventListener(
+        "submit",
+        function(e) {
+
+            e.preventDefault();
+
+
+            const email =
+                document.getElementById("loginEmail")
+                .value.trim()
+                .toLowerCase();
+
+
+            const password =
+                document.getElementById("loginPassword")
+                .value;
+
+
+            const accounts =
+                getAccounts();
+
+
+            const account =
+                accounts.find(
+                    user =>
+                        user.email === email &&
+                        user.password === password
+                );
+
+
+            if (!account) {
+
+                showAuthMessage(
+                    "Invalid email or password.",
+                    true
+                );
+
+                return;
+
+            }
+
+
+            currentUser = account;
+
+
+            localStorage.setItem(
+                "cms_logged_in",
+                account.id
+            );
+
+
+            loginForm.reset();
+
+            openApp();
+
+        }
+    );
+
+
+    /* LOGOUT */
+
+    function logout() {
+
+        currentUser = null;
+
+        contacts = [];
+
+        localStorage.removeItem(
+            "cms_logged_in"
+        );
+
+
+        appContainer.classList.add("hidden");
+
+        authScreen.classList.remove("hidden");
+
+
+        showLogin();
+
+        showAuthMessage(
+            "You have been logged out."
+        );
+
+    }
+
+
+    loginTab.addEventListener(
+        "click",
+        showLogin
+    );
+
+
+    createTab.addEventListener(
+        "click",
+        showCreateAccount
+    );
+
+
+    logoutBtn.addEventListener(
+        "click",
+        logout
+    );
+
+
+    /* =========================
+       CONTACT STORAGE
+    ========================= */
+
+    function getContactStorageKey() {
+
+        if (!currentUser) {
+
+            return null;
+
+        }
+
+
+        return (
+            "cms_contacts_" +
+            currentUser.id
+        );
+
+    }
+
+
+    function loadContacts() {
+
+        const key =
+            getContactStorageKey();
+
+
+        if (!key) {
+
+            contacts = [];
+
+            return;
+
+        }
+
+
+        const stored =
+            localStorage.getItem(key);
+
+
+        if (stored) {
+
+            try {
+
+                contacts =
+                    JSON.parse(stored);
+
+            }
+
+            catch {
+
+                contacts = [];
+
+            }
+
+        }
+
+        else {
+
+            contacts = [];
+
+        }
+
+    }
+
+
+    function saveContacts() {
+
+        const key =
+            getContactStorageKey();
+
+
+        if (!key) return;
+
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(contacts)
+        );
+
+    }
+
+
+    /* =========================
+       OPEN APPLICATION
+    ========================= */
+
+    function openApp() {
+
+        authScreen.classList.add("hidden");
+
+        appContainer.classList.remove("hidden");
+
+
+        userNameDisplay.textContent =
+            currentUser.name;
+
+
+        loadContacts();
+
+        renderContacts();
+
+        updateActiveFilterButton();
+
+    }
+
+
+    /* =========================
+       THEME
+    ========================= */
+
+    function applyTheme(theme) {
+
+        if (theme === "dark") {
+
+            document.body.classList.add("dark");
+
+            themeIcon.className =
+                "fas fa-sun";
+
+            themeToggle.title =
+                "Switch to light mode";
+
+        }
+
+        else {
+
+            document.body.classList.remove("dark");
+
+            themeIcon.className =
+                "fas fa-moon";
+
+            themeToggle.title =
+                "Switch to dark mode";
+
+        }
+
+
+        localStorage.setItem(
+            "cms_theme",
+            theme
+        );
+
+    }
+
+
+    function loadTheme() {
+
+        const saved =
+            localStorage.getItem("cms_theme");
+
+
+        if (
+            saved === "dark" ||
+            saved === "light"
+        ) {
+
+            applyTheme(saved);
+
+        }
+
+        else {
+
+            applyTheme("light");
+
+        }
+
+    }
+
+
+    themeToggle.addEventListener(
+        "click",
+        function() {
+
+            const dark =
+                document.body.classList.contains("dark");
+
+
+            applyTheme(
+                dark ? "light" : "dark"
+            );
+
+        }
+    );
+
+
+    /* =========================
+       UTILITIES
+    ========================= */
+
+    function generateId() {
+
+        return (
+            Date.now() +
+            "-" +
+            Math.random()
+                .toString(36)
+                .substring(2, 9)
+        );
+
+    }
+
+
+    function escapeHtml(text) {
+
+        if (!text) return "";
+
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+
+    }
+
+
+    function showToast(
+        message,
+        error = false
+    ) {
+
+        toastMessage.textContent =
+            message;
+
+
+        const icon =
+            toast.querySelector("i");
+
+
+        if (error) {
+
+            icon.className =
+                "fas fa-exclamation-circle";
+
+            icon.style.color =
+                "#ff8a8a";
+
+        }
+
+        else {
+
+            icon.className =
+                "fas fa-check-circle";
+
+            icon.style.color =
+                "";
+
+        }
+
+
+        toast.classList.add("show");
+
+
+        setTimeout(
+            function() {
+
+                toast.classList.remove("show");
+
+            },
+            2600
+        );
+
+    }
+
+
+    /* =========================
+       ADD CONTACT
+    ========================= */
+
+    function addContact() {
+
+        const name =
+            nameInput.value.trim();
+
+
+        const email =
+            emailInput.value.trim();
+
+
+        const phone =
+            phoneInput.value.trim();
+
+
+        const category =
+            categoryInput.value.trim() ||
+            "General";
+
+
+        if (!name || !email || !phone) {
+
+            showToast(
+                "Please fill in name, email and phone.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !email.includes("@") ||
+            !email.includes(".")
+        ) {
+
+            showToast(
+                "Please enter a valid email address.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        contacts.push({
+
+            id: generateId(),
+
+            name: name,
+
+            email: email,
+
+            phone: phone,
+
+            category: category
+
+        });
+
+
+        saveContacts();
+
+
+        nameInput.value = "";
+
+        emailInput.value = "";
+
+        phoneInput.value = "";
+
+        categoryInput.value = "";
+
+
+        currentFilter = "all";
+
+        searchQuery = "";
+
+        searchInput.value = "";
+
+
+        updateActiveFilterButton();
+
+        renderContacts();
+
+
+        showToast(
+            `"${name}" added.`
+        );
+
+
+        nameInput.focus();
+
+    }
+
+
+    addContactBtn.addEventListener(
+        "click",
+        addContact
+    );
+
+
+    /* ENTER KEY */
+
+    [
+        nameInput,
+        emailInput,
+        phoneInput,
+        categoryInput
+    ].forEach(
+        input => {
+
+            input.addEventListener(
+                "keypress",
+                function(e) {
+
+                    if (e.key === "Enter") {
+
+                        e.preventDefault();
+
+                        addContact();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    /* =========================
+       RENDER CONTACTS
+    ========================= */
+
+    function renderContacts() {
+
+        let filtered =
+            [...contacts];
+
+
+        if (currentFilter !== "all") {
+
+            filtered =
+                filtered.filter(
+                    contact =>
+                        contact.category
+                            .toLowerCase() ===
+                        currentFilter.toLowerCase()
+                );
+
+        }
+
+
+        if (searchQuery.trim() !== "") {
+
+            const query =
+                searchQuery
+                    .trim()
+                    .toLowerCase();
+
+
+            filtered =
+                filtered.filter(
+                    contact =>
+
+                        contact.name
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        contact.email
+                            .toLowerCase()
+                            .includes(query)
+
+                        ||
+
+                        contact.phone
+                            .toLowerCase()
+                            .includes(query)
+                );
+
+        }
+
+
+        filtered.sort(
+            (a,b) =>
+                a.name.localeCompare(b.name)
+        );
+
+
+        contactCount.textContent =
+            contacts.length;
+
+
+        if (filtered.length === 0) {
+
+            contactGrid.innerHTML = `
+
+                <div class="empty-state">
+
+                    <i class="fas fa-address-card"></i>
+
+                    <p>
+                        No contacts found.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        filtered.forEach(
+            contact => {
+
+                const initial =
+                    contact.name
+                        .charAt(0)
+                        .toUpperCase();
+
+
+                html += `
+
+                    <div
+                        class="contact-card"
+                        data-id="${contact.id}">
+
+                        <div class="card-header">
+
+                            <div class="avatar">
+                                ${initial}
+                            </div>
+
+                            <div class="contact-name">
+                                ${escapeHtml(contact.name)}
+                            </div>
+
+                        </div>
+
+
+                        <div class="contact-detail">
+
+                            <i class="fas fa-envelope"></i>
+
+                            <span>
+                                ${escapeHtml(contact.email)}
+                            </span>
+
+                        </div>
+
+
+                        <div class="contact-detail">
+
+                            <i class="fas fa-phone-alt"></i>
+
+                            <span>
+                                ${escapeHtml(contact.phone)}
+                            </span>
+
+                        </div>
+
+
+                        <div class="category-tag">
+
+                            ${escapeHtml(
+                                contact.category ||
+                                "General"
+                            )}
+
+                        </div>
+
+
+                        <div class="card-actions">
+
+                            <button
+                                class="action-btn edit"
+                                data-id="${contact.id}"
+                                title="Edit contact">
+
+                                <i class="fas fa-pen"></i>
+
+                            </button>
+
+
+                            <button
+                                class="action-btn delete"
+                                data-id="${contact.id}"
+                                title="Delete contact">
+
+                                <i class="fas fa-trash"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        contactGrid.innerHTML =
+            html;
+
+
+        document
+            .querySelectorAll(".action-btn.edit")
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            editContact(
+                                button.dataset.id
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        document
+            .querySelectorAll(".action-btn.delete")
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            deleteContact(
+                                button.dataset.id
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =========================
+       EDIT CONTACT
+    ========================= */
+
+    function editContact(id) {
+
+        const contact =
+            contacts.find(
+                c => c.id === id
+            );
+
+
+        if (!contact) return;
+
+
+        const newName =
+            prompt(
+                "Edit name:",
+                contact.name
+            );
+
+
+        if (newName === null) return;
+
+
+        const newEmail =
+            prompt(
+                "Edit email:",
+                contact.email
+            );
+
+
+        if (newEmail === null) return;
+
+
+        const newPhone =
+            prompt(
+                "Edit phone:",
+                contact.phone
+            );
+
+
+        if (newPhone === null) return;
+
+
+        const newCategory =
+            prompt(
+                "Edit category:",
+                contact.category
+            );
+
+
+        if (newCategory === null) return;
+
+
+        if (
+            !newName.trim() ||
+            !newEmail.trim() ||
+            !newPhone.trim()
+        ) {
+
+            showToast(
+                "All fields are required.",
+                true
+            );
+
+            return;
+
+        }
+
+
+        contact.name =
+            newName.trim();
+
+        contact.email =
+            newEmail.trim();
+
+        contact.phone =
+            newPhone.trim();
+
+        contact.category =
+            newCategory.trim() ||
+            "General";
+
+
+        saveContacts();
+
+        renderContacts();
+
+
+        showToast(
+            `"${contact.name}" updated.`
+        );
+
+    }
+
+
+    /* =========================
+       DELETE CONTACT
+    ========================= */
+
+    function deleteContact(id) {
+
+        const contact =
+            contacts.find(
+                c => c.id === id
+            );
+
+
+        if (!contact) return;
+
+
+        const confirmed =
+            confirm(
+                `Delete "${contact.name}"? This cannot be undone.`
+            );
+
+
+        if (!confirmed) return;
+
+
+        contacts =
+            contacts.filter(
+                c => c.id !== id
+            );
+
+
+        saveContacts();
+
+        renderContacts();
+
+
+        showToast(
+            `"${contact.name}" deleted.`
+        );
+
+    }
+
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    searchInput.addEventListener(
+        "input",
+        function(e) {
+
+            searchQuery =
+                e.target.value;
+
+            renderContacts();
+
+        }
+    );
+
+
+    /* =========================
+       FILTERS
+    ========================= */
+
+    function updateActiveFilterButton() {
+
+        document
+            .querySelectorAll(".filter-btn")
+            .forEach(
+                button => {
+
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.filter ===
+                        currentFilter
+                    );
+
+                }
+            );
+
+    }
+
+
+    filterGroup.addEventListener(
+        "click",
+        function(e) {
+
+            const button =
+                e.target.closest(
+                    ".filter-btn"
+                );
+
+
+            if (!button) return;
+
+
+            currentFilter =
+                button.dataset.filter;
+
+
+            updateActiveFilterButton();
+
+            renderContacts();
+
+        }
+    );
+
+
+    /* =========================
+       CHECK LOGIN
+    ========================= */
+
+    function checkLogin() {
+
+        const loggedInId =
+            localStorage.getItem(
+                "cms_logged_in"
+            );
+
+
+        if (!loggedInId) {
+
+            authScreen.classList.remove(
+                "hidden"
+            );
+
+            appContainer.classList.add(
+                "hidden"
+            );
+
+            return;
+
+        }
+
+
+        const accounts =
+            getAccounts();
+
+
+        const account =
+            accounts.find(
+                user =>
+                    user.id === loggedInId
+            );
+
+
+        if (!account) {
+
+            localStorage.removeItem(
+                "cms_logged_in"
+            );
+
+            authScreen.classList.remove(
+                "hidden"
+            );
+
+            return;
+
+        }
+
+
+        currentUser = account;
+
+        openApp();
+
+    }
+
+
+    /* =========================
+       INITIALIZATION
+    ========================= */
+
+    loadTheme();
+
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            setTimeout(
+                function() {
+
+                    loadingScreen.classList.add(
+                        "hide"
+                    );
+
+
+                    setTimeout(
+                        function() {
+
+                            loadingScreen.remove();
+
+                            checkLogin();
+
+                        },
+                        700
+                    );
+
+                },
+                1400
+            );
+
+        }
+    );
+
+})();
+
+</script>
+
+</body>
+</html>
